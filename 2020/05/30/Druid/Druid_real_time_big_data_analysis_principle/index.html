@@ -1,0 +1,647 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="format-detection" content="telephone=no"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black"><link rel="icon" href="/assets/favicon16.png?v=2.0.1" type="image/png" sizes="16x16"><link rel="icon" href="/assets/favicon32.png?v=2.0.1" type="image/png" sizes="32x32"><meta name="description" content="Druid大数据分析框架原理分析 转载自公众号 暴走大数据  Druid是一个分布式支持实时分析的数据存储系统，为分析而生，在处理数据的规模和数据处理实时性方面比传统OLAP系统有显著的性能改进。与阿里的druid无关。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hive SQL50道练习题">
+<meta property="og:url" content="https://chenhefei.github.io/2020/05/30/Druid/Druid_real_time_big_data_analysis_principle/index.html">
+<meta property="og:site_name" content="随机漫步的傻瓜">
+<meta property="og:description" content="Druid大数据分析框架原理分析 转载自公众号 暴走大数据  Druid是一个分布式支持实时分析的数据存储系统，为分析而生，在处理数据的规模和数据处理实时性方面比传统OLAP系统有显著的性能改进。与阿里的druid无关。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gitee.com/hoffeechen/image/raw/master/img/20200530211327.png">
+<meta property="og:image" content="https://gitee.com/hoffeechen/image/raw/master/img/20200530211351.png">
+<meta property="og:image" content="https://gitee.com/hoffeechen/image/raw/master/img/20200530211418.png">
+<meta property="og:image" content="https://gitee.com/hoffeechen/image/raw/master/img/20200530211453.png">
+<meta property="og:image" content="https://gitee.com/hoffeechen/image/raw/master/img/20200530211520.png">
+<meta property="og:image" content="https://gitee.com/hoffeechen/image/raw/master/img/20200530211646.png">
+<meta property="article:published_time" content="2020-05-30T13:12:19.000Z">
+<meta property="article:modified_time" content="2020-05-30T13:21:06.655Z">
+<meta property="article:author" content="Paradiser">
+<meta property="article:tag" content="大数据框架">
+<meta property="article:tag" content="Druid">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gitee.com/hoffeechen/image/raw/master/img/20200530211327.png"><meta name="keywords" content="Paradiser, 随机漫步的傻瓜"><meta name="description" content=""><title>Hive SQL50道练习题 | 随机漫步的傻瓜</title><link ref="canonical" href="https://chenhefei.github.io/2020/05/30/Druid/Druid_real_time_big_data_analysis_principle/"><link rel="dns-prefetch" href="https://cdn.jsdelivr.net"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.12.1/css/all.min.css" type="text/css"><link rel="stylesheet" href="/css/index.css?v=2.0.1"><script>var Stun = window.Stun || {};
+var CONFIG = {
+  root: '/',
+  algolia: undefined,
+  fontIcon: {"prompt":{"success":"fas fa-check-circle","info":"fas fa-arrow-circle-right","warning":"fas fa-exclamation-circle","error":"fas fa-times-circle"},"copyBtn":"fas fa-copy"},
+  sidebar: {"offsetTop":"10px","tocMaxDepth":6},
+  header: {"enable":true,"showOnPost":true,"scrollDownIcon":false},
+  postWidget: {"endText":true},
+  nightMode: {"enable":true},
+  back2top: {"enable":true},
+  codeblock: {"style":"default","highlight":"light","wordWrap":true},
+  reward: false,
+  fancybox: false,
+  zoomImage: {"gapAside":"20px"},
+  galleryWaterfall: undefined,
+  lazyload: true,
+  pjax: {"avoidBanner":true},
+  externalLink: {"icon":{"enable":true,"name":"fas fa-external-link-alt"}},
+  shortcuts: undefined,
+  prompt: {"copyButton":"复制","copySuccess":"复制成功","copyError":"复制失败"},
+  sourcePath: {"js":"js","css":"css","images":"images"},
+};
+
+window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 4.2.1"></head><body><div class="container" id="container"><header class="header" id="header"><div class="header-inner"><nav class="header-nav header-nav--fixed"><div class="header-nav-inner"><div class="header-nav-menubtn"><i class="fas fa-bars"></i></div><div class="header-nav-menu"><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/"><span class="header-nav-menu-item__icon"><i class="fas fa-home"></i></span><span class="header-nav-menu-item__text">首页</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/archives/"><span class="header-nav-menu-item__icon"><i class="fas fa-folder-open"></i></span><span class="header-nav-menu-item__text">归档</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/categories/"><span class="header-nav-menu-item__icon"><i class="fas fa-layer-group"></i></span><span class="header-nav-menu-item__text">分类</span></a></div><div class="header-nav-menu-item"><a class="header-nav-menu-item__link" href="/tags/"><span class="header-nav-menu-item__icon"><i class="fas fa-tags"></i></span><span class="header-nav-menu-item__text">标签</span></a></div></div><div class="header-nav-mode"><div class="mode"><div class="mode-track"><span class="mode-track-moon"></span><span class="mode-track-sun"></span></div><div class="mode-thumb"></div></div></div></div></nav><div class="header-banner"><div class="header-banner-info"><div class="header-banner-info__title">随机漫步的傻瓜</div><div class="header-banner-info__subtitle"></div></div></div></div></header><main class="main" id="main"><div class="main-inner"><div class="content-wrap" id="content-wrap"><div class="content" id="content"><!-- Just used to judge whether it is an article page--><div id="is-post"></div><div class="post"><header class="post-header"><h1 class="post-title">Hive SQL50道练习题</h1><div class="post-meta"><span class="post-meta-item post-meta-item--createtime"><span class="post-meta-item__icon"><i class="far fa-calendar-plus"></i></span><span class="post-meta-item__info">发表于</span><span class="post-meta-item__value">2020-05-30</span></span><span class="post-meta-item post-meta-item--updatetime"><span class="post-meta-item__icon"><i class="far fa-calendar-check"></i></span><span class="post-meta-item__info">更新于</span><span class="post-meta-item__value">2020-05-30</span></span><span class="post-meta-item post-meta-item--wordcount"><span class="post-meta-item__icon"><i class="far fa-file-word"></i></span><span class="post-meta-item__info">字数统计</span><span class="post-meta-item__value">4.4k</span></span><span class="post-meta-item post-meta-item--readtime"><span class="post-meta-item__icon"><i class="far fa-clock"></i></span><span class="post-meta-item__info">阅读时长</span><span class="post-meta-item__value">23分</span></span></div></header><div class="post-body">
+        <h2 id="Druid"   >
+          <a href="#Druid" class="heading-link"><i class="fas fa-link"></i></a>Druid</h2>
+      <p>Druid是一个分布式支持实时分析的数据存储系统，为分析而生，在处理数据的规模和数据处理实时性方面比传统OLAP系统有显著的性能改进。<strong>与阿里的druid无关。</strong></p>
+
+        <h3 id="Druid的三个设计原则"   >
+          <a href="#Druid的三个设计原则" class="heading-link"><i class="fas fa-link"></i></a>Druid的三个设计原则</h3>
+      <ol>
+<li><p>快速查询：数据预聚合+内存化+索引</p>
+<p>仅存储经过预聚合的数据，如1分钟，1小时等，极大的提高了性能；使用Bitmap和各种压缩技术，并维护一些倒排索引，可以提高内存使用效率和AND，OR操作。</p>
+</li>
+<li><p>水平扩展：分布式数据+并行化查询</p>
+<p>一般按照时间范围把聚合数据进行分区处理，对于高维度数据还支持对Segment( &lt; 2000万行)进行分区；历史Segment数据可以存储在本地磁盘，HDFS或云服务中；如果节点故障可借助ZK重新构造数据；Druid内置了容易并行化的集合操作，在直方图方面和去重查询方面采用近似算法保证性能，如HyperLoglog，DataSketches等</p>
+</li>
+<li><p>实时分析：不可变的过去，仅追加的未来</p>
+<p>提供基于时间维度的数据存储服务，且每行数据一旦进入系统就不能改变；历史数据以Segment数据文件方式组织，需要查询时再装载到内存</p>
+</li>
+</ol>
+
+        <h3 id="技术特点"   >
+          <a href="#技术特点" class="heading-link"><i class="fas fa-link"></i></a>技术特点</h3>
+      <ul>
+<li>数据吞吐量大</li>
+<li>支持流式数据摄入和实时</li>
+<li>查询灵活且快</li>
+<li>社区支持力度大</li>
+</ul>
+
+        <h3 id="数据格式"   >
+          <a href="#数据格式" class="heading-link"><i class="fas fa-link"></i></a>数据格式</h3>
+      <ul>
+<li><p>数据源（类似数据库中表的概念，存放一类数据）</p>
+</li>
+<li><ul>
+<li>时间列：每个数据源都需要有的事件时间，是预聚合的主要依据</li>
+<li>维度列：用于标识事件和属性，用于聚合</li>
+<li>指标列：用于聚合计算的列，通常是关键量化指标</li>
+</ul>
+</li>
+<li><p>数据摄入</p>
+</li>
+<li><ul>
+<li>实时摄入：Kafka</li>
+<li>批量摄入：HDFS、CSV等</li>
+</ul>
+</li>
+<li><p>数据查询</p>
+</li>
+<li><ul>
+<li>原生Json查询，Http接口</li>
+<li>类SQL查询，支持大部分SQL语法（本书出版时还未支持）</li>
+</ul>
+</li>
+</ul>
+<hr>
+
+        <h2 id="数据分析软件分类"   >
+          <a href="#数据分析软件分类" class="heading-link"><i class="fas fa-link"></i></a>数据分析软件分类</h2>
+      <ul>
+<li><p>商业软件</p>
+</li>
+<li><ul>
+<li>HP Vertica</li>
+<li>Oracle Exadata</li>
+<li>Teradata</li>
+</ul>
+</li>
+<li><p>时序数据库</p>
+</li>
+<li><ul>
+<li>OpenTSDB</li>
+<li>InfluxDB</li>
+</ul>
+</li>
+<li><p>开源分布式计算平台</p>
+</li>
+<li><ul>
+<li>Hadoop</li>
+<li>Spark</li>
+</ul>
+</li>
+<li><p>开源分析数据库</p>
+</li>
+<li><ul>
+<li>Pinot</li>
+<li>Kylin</li>
+<li>Google Dremel</li>
+<li>Apache Drill</li>
+<li>Elasticsearch(ES)</li>
+</ul>
+</li>
+<li><p>SQL on Hadoop/Spark</p>
+</li>
+<li><ul>
+<li>Hive</li>
+<li>Impala</li>
+<li>Presto</li>
+</ul>
+</li>
+<li><p>数据分析云服务</p>
+</li>
+<li><ul>
+<li><p>Redshift</p>
+</li>
+<li><p>阿里云</p>
+</li>
+</ul>
+</li>
+</ul>
+
+        <h2 id="Druid架构"   >
+          <a href="#Druid架构" class="heading-link"><i class="fas fa-link"></i></a>Druid架构</h2>
+      
+        <h3 id="概览"   >
+          <a href="#概览" class="heading-link"><i class="fas fa-link"></i></a>概览</h3>
+      <p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://gitee.com/hoffeechen/image/raw/master/img/20200530211327.png"  alt="">
+      </p>
+<ul>
+<li><p>Druid自身包含的节点</p>
+</li>
+<li><ul>
+<li>实时节点：摄入实时数据，生成Segment数据文件</li>
+<li>历史节点：加载生成好的数据文件，供查询</li>
+<li>查询节点：对外提供查询服务，并支持同时查询实时和历史节点，并合并结果</li>
+<li>协调节点：负责历史节点的数据负载均衡，并管理数据生命周期</li>
+</ul>
+</li>
+<li><p>Druid依赖的外部组件</p>
+</li>
+<li><ul>
+<li>元数据库：存储元数据信息，如Segment的相关信息。一般是Mysql</li>
+<li>分布式协调服务：提供分布式一致性的组件，一般是Zookeeper</li>
+<li>数据文件存储库：提供数据文件的存储功能，一般是本地磁盘或HDFS等</li>
+</ul>
+</li>
+</ul>
+
+        <h3 id="架构设计思想"   >
+          <a href="#架构设计思想" class="heading-link"><i class="fas fa-link"></i></a>架构设计思想</h3>
+      
+        <h4 id="索引"   >
+          <a href="#索引" class="heading-link"><i class="fas fa-link"></i></a>索引</h4>
+      <p>提高数据库查找速度的关键之一是减少磁盘的访问次数，并采用树形结构做索引</p>
+<ul>
+<li>二叉查找树和平衡二叉树<br>二叉查找树在极端非平衡情况下查询效率会退化到O(N),因此尝试采用平衡二叉树；但是平衡二叉树的树高为:</li>
+</ul>
+<p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://gitee.com/hoffeechen/image/raw/master/img/20200530211351.png"  alt="">
+      </p>
+<ul>
+<li><p>树高越高，查询次数越多越慢。同时，每次访问磁盘会读取多个扇区的数据，远大于单个树节点的值，造成浪费</p>
+</li>
+<li><p>B+树<br>传统关系型数据库的常用结构。</p>
+</li>
+<li><ul>
+<li>每个树节点只放键值，不放数值，叶子节点存放数值，使得树高度较低</li>
+<li>叶子节点按值大小顺序排序，带指向相邻节点的指针，方便区间数据查询</li>
+<li>从叶子节点开始更新，以较小的代价实现自平衡</li>
+<li><strong>缺点是随着数据插入，叶子节点会分裂，导致连续数据被存放在不同的物理磁盘块上，导致较大的IO开销</strong></li>
+</ul>
+</li>
+<li><p>日志结构合并树（LSM）<br>日志结构的所有方式的将磁盘看做一个大的日志，每次都将新数据和索引结构添加到最末端；LSM通过将数据文件预排序解决了日志结构随机读性能差的问题。</p>
+</li>
+</ul>
+<ul>
+<li><ul>
+<li>使用两颗树来存储数据，其中一部分数据结构存在内存负责插入更新和读请求，并在内存中进行排序；另一部分写在磁盘,负责读操作，有序且不能更改</li>
+<li>使用日志文件做数据恢复保障，所有操作记录先写Log，再写memtable，最后冲写到sstable</li>
+<li>定期合并小sstable以减少sstable数量，对每个sstable使用布隆过滤器，以加速数据存在与否的判定</li>
+</ul>
+</li>
+</ul>
+<p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://gitee.com/hoffeechen/image/raw/master/img/20200530211418.png"  alt="">
+      </p>
+<p>Druid对命令查询职责分离模式（CQRS）的借鉴，优势如下：</p>
+<ul>
+<li>类LSM-tree使得数据高速写入，并提供快速实时查询</li>
+<li>不提供已有数据更改，虽然降低数据完整性保障，但是减少了工作量，提高性能</li>
+<li>对CQRS模式的借鉴使得组件职责分明，易于优化</li>
+</ul>
+
+        <h2 id="数据结构"   >
+          <a href="#数据结构" class="heading-link"><i class="fas fa-link"></i></a>数据结构</h2>
+      <ul>
+<li><p>DataSource（类似于表）</p>
+</li>
+<li><ul>
+<li>时间列：表明每行数据的时间，默认使用UTC并精确到毫秒</li>
+<li>维度列：来自于OLAP概念，标识类别信息</li>
+<li>指标列：用于聚合和计算的列，通常是一些数字</li>
+</ul>
+</li>
+</ul>
+<p>支持对任意指标列进行聚合（Roll Up）操作，如同维度列聚合或指定时间粒度的聚合。<strong>在存储时就对数据进行聚合是Druid的特点，可以节省存储空间，提高查询效率</strong></p>
+<ul>
+<li><p>Segment结构</p>
+</li>
+<li><ul>
+<li>通过对segmentGranularity的设置，将不同时间范围的数据存储在不同Segment数据块中；查询数据仅需访问对应时间段内的数据块，效率极大提高。</li>
+<li>提供面对列的数据压缩存储，并使用Bitmap等技术对访问进行优化</li>
+</ul>
+</li>
+</ul>
+
+        <h2 id="实时节点"   >
+          <a href="#实时节点" class="heading-link"><i class="fas fa-link"></i></a>实时节点</h2>
+      <p>实时节点主要负责实时数据摄入，生成Segment数据文件；</p>
+
+        <h3 id="Segment文件的制造和传播"   >
+          <a href="#Segment文件的制造和传播" class="heading-link"><i class="fas fa-link"></i></a>Segment文件的制造和传播</h3>
+      <ul>
+<li>实时节点通过Firehose来消费实时数据</li>
+<li>实时节点通过Plumber来生成数据文件，并将多个数据块合并成一个大的Segment</li>
+</ul>
+<p>Segment文件的传播过程见上篇</p>
+
+        <h3 id="高可用和可扩展性"   >
+          <a href="#高可用和可扩展性" class="heading-link"><i class="fas fa-link"></i></a>高可用和可扩展性</h3>
+      <p>可以使用一组节点组成Group共同消费一个Topic，使得每个分区不会被多余一个实时节点消费。当节点会主动将Offset提交到ZK，这样能实现节点失败重分配，同时保证了实时扩展性。</p>
+<p>为了避免挂掉的节点已消费但未上传的数据丢失，可以采用以下方法<br>– 使得挂掉的节点恢复，重启时节点会加载所有尚未上传的Segment文件，保证数据完整<br>– 使用Tranquility和索引服务对Topic进行精确消费和备份。</p>
+
+        <h2 id="历史节点"   >
+          <a href="#历史节点" class="heading-link"><i class="fas fa-link"></i></a>历史节点</h2>
+      <ul>
+<li>启动时，先检查本地已有的Segment文件，并从DeepStorage中下载属于自己但不在本地的Segment数据文件</li>
+<li>查询时，现将Segment文件加载到内存再提供查询</li>
+<li>历史节点的查询速度与内存空间大小和负责的Segment数据文件大小之比成正比</li>
+</ul>
+
+        <h3 id="层的分组功能"   >
+          <a href="#层的分组功能" class="heading-link"><i class="fas fa-link"></i></a>层的分组功能</h3>
+      <ul>
+<li><p>数据温度用来描述数据被访问的频繁程度</p>
+</li>
+<li><ul>
+<li>热数据：经常被访问，数据量不大，要求最高响应</li>
+<li>温数据：不常被访问，数据量中等，要求尽可能快</li>
+<li>冷数据：偶尔被访问，数据量大，不要求响应速度</li>
+</ul>
+</li>
+<li><p>Druid提出层（Tier）的概念，将历史节点根据性能容量分为不同的层，并且可让不同性质的DataSource使用不同的层来存储Segment</p>
+</li>
+</ul>
+
+        <h3 id="高可用和扩展"   >
+          <a href="#高可用和扩展" class="heading-link"><i class="fas fa-link"></i></a>高可用和扩展</h3>
+      <ul>
+<li>新的历史节点添加后会通过ZK被协调节点发现，协调节点会自动分配Segment给他</li>
+<li>历史节点被移除后同样被协调节点发现，并将原本分配给这个节点的Segment分配给其他可用节点</li>
+</ul>
+
+        <h2 id="查询节点"   >
+          <a href="#查询节点" class="heading-link"><i class="fas fa-link"></i></a>查询节点</h2>
+      <p>一般情况下，Druid集群对外提供服务的只有查询节点，查询节点会将实时节点和历史节点查询到的数据合并后返回客户端</p>
+
+        <h3 id="缓存"   >
+          <a href="#缓存" class="heading-link"><i class="fas fa-link"></i></a>缓存</h3>
+      <p>Druid支持使用Cache机制来提高查询效率；查询时首先访问Cache，不命中时才会去访问数据</p>
+<ul>
+<li>外部Cache，如Memcached</li>
+<li>内部Cache，查询节点或历史节点的内存</li>
+</ul>
+
+        <h3 id="高可用"   >
+          <a href="#高可用" class="heading-link"><i class="fas fa-link"></i></a>高可用</h3>
+      <p>可以使用如Nginx来完成对多个查询节点的负载均衡，以实现高可用</p>
+
+        <h2 id="协调节点"   >
+          <a href="#协调节点" class="heading-link"><i class="fas fa-link"></i></a>协调节点</h2>
+      <p>协调节点负责历史节点的数据负载均衡和通过规则管理数据生命周期</p>
+
+        <h3 id="数据负载均衡"   >
+          <a href="#数据负载均衡" class="heading-link"><i class="fas fa-link"></i></a>数据负载均衡</h3>
+      <p>对于历史节点来说，协调节点类似于他们的Master，协调节点会给历史节点分配数据，来达到数据负载均衡。<strong>当协调节点挂掉时，历史节点可以提供查询服务，但是不能接收新的Segment</strong></p>
+
+        <h3 id="管理生命周期"   >
+          <a href="#管理生命周期" class="heading-link"><i class="fas fa-link"></i></a>管理生命周期</h3>
+      <p>协调节点会根据DataSource配置的规则对于每个Segment文件逐条检查，当符合规则时就立即命令历史节点执行这个命令（加载或丢弃）</p>
+
+        <h3 id="高可用性"   >
+          <a href="#高可用性" class="heading-link"><i class="fas fa-link"></i></a>高可用性</h3>
+      <p>默认情况下，从历史节点挂掉到协调节点重新分配这个节点上的Segment文件到其他历史节点的这段时间内，挂掉节点上的数据是不可访问的；但是可以通过增加副本的方式在多个历史节点上存储同一份数据来保障高可用</p>
+
+        <h2 id="索引服务"   >
+          <a href="#索引服务" class="heading-link"><i class="fas fa-link"></i></a>索引服务</h2>
+      <p>索引服务也可以产生Segment文件，支持pull，push模式方式，可通过API编程的方式来灵活定义任务配置，并完成跟Segment相关的所有操作</p>
+
+        <h3 id="主从架构"   >
+          <a href="#主从架构" class="heading-link"><i class="fas fa-link"></i></a>主从架构</h3>
+      <p>索引服务包含统治节点为主节点，中间管理者节点为从节点</p>
+
+        <h3 id="统治节点"   >
+          <a href="#统治节点" class="heading-link"><i class="fas fa-link"></i></a>统治节点</h3>
+      <p>负责对外接收任务请求，对内将任务分解并下发到从节点上；统治节点提供RESTful的访问方法，可以通过HTTP请求提交任务或查看任务状态。统治节点有以下两种运行模式</p>
+<ul>
+<li>本地模式：统治节点不止负责集群任务协调分配，也能启动一些苦工（peon）来完成具体工作</li>
+<li>远程模式：统治节点和中间管理者运行在不同节点上，此时统治节点仅完成集群任务协调分配。</li>
+</ul>
+
+        <h3 id="中间管理者-amp-苦工"   >
+          <a href="#中间管理者-amp-苦工" class="heading-link"><i class="fas fa-link"></i></a>中间管理者&amp;苦工</h3>
+      <p>中间管理者就是索引服务的工作节点，负责接收统治节点分配的任务，并启动相关苦工（独立的JVM）来完成任务</p>
+<p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://gitee.com/hoffeechen/image/raw/master/img/20200530211453.png"  alt="">
+      </p>
+
+        <h2 id="数据摄入"   >
+          <a href="#数据摄入" class="heading-link"><i class="fas fa-link"></i></a>数据摄入</h2>
+      
+        <h3 id="方式"   >
+          <a href="#方式" class="heading-link"><i class="fas fa-link"></i></a>方式</h3>
+      <ul>
+<li><p>流式数据：指不断产生数据的数据源，如消息队列，日志等；Druid提供了Push和Pull两种方式</p>
+</li>
+<li><ul>
+<li>Pull方式需要启动一个实时节点，通过不同的Firehose摄入</li>
+<li>Push方式需要启动索引服务，提供一个Http接口来接受数据推送</li>
+</ul>
+</li>
+<li><p>静态数据：指已经产生完全，不会产生新数据的源，如离线数据；也可通过上述两种方式来摄取</p>
+</li>
+</ul>
+
+        <h3 id="流式数据摄取"   >
+          <a href="#流式数据摄取" class="heading-link"><i class="fas fa-link"></i></a>流式数据摄取</h3>
+      
+        <h4 id="Pull"   >
+          <a href="#Pull" class="heading-link"><i class="fas fa-link"></i></a>Pull</h4>
+      <ul>
+<li><p>定义配置文件，包含三部分</p>
+</li>
+<li><ul>
+<li>dataSchema 包括数据源的描述，数据类型，列，指标列等等；参考文档</li>
+<li>ioConfig 指定了具体的数据源，如Kafka Topic，Server等配置</li>
+<li>tuningConfig 优化参数</li>
+</ul>
+</li>
+</ul>
+
+        <h4 id="Push"   >
+          <a href="#Push" class="heading-link"><i class="fas fa-link"></i></a>Push</h4>
+      <ol>
+<li>启动索引任务，需要向统治节点发送一份Ingestion Spec</li>
+<li>通过push-event接口发送数据</li>
+</ol>
+
+        <h3 id="静态数据摄取"   >
+          <a href="#静态数据摄取" class="heading-link"><i class="fas fa-link"></i></a>静态数据摄取</h3>
+      <ul>
+<li>索引方式：向统治节点提交索引任务</li>
+<li>以Hadoop方式摄取：向统治节点Post一个请求，启动Hadoop Index Job，Druid会提交一个MR任务到Hadoop，适合离线数据生成历史分片</li>
+</ul>
+
+        <h3 id="流式与批量数据摄取的结合"   >
+          <a href="#流式与批量数据摄取的结合" class="heading-link"><i class="fas fa-link"></i></a>流式与批量数据摄取的结合</h3>
+      
+        <h4 id="Lambda架构"   >
+          <a href="#Lambda架构" class="heading-link"><i class="fas fa-link"></i></a>Lambda架构</h4>
+      <p>满足一个稳定的大规模数据处理系统所需的容错性，低延迟，可扩展性；</p>
+<ul>
+<li>任何数据可定义为 query = func(all data)</li>
+<li>人为容错性：数据是易丢失的</li>
+<li>数据不可变性：数据是只读的，不再变化</li>
+<li>重新计算：基于上面两个原则，运行函数重新计算结果是可能的</li>
+</ul>
+<p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://gitee.com/hoffeechen/image/raw/master/img/20200530211520.png"  alt="">
+      </p>
+<p>该架构具有如下特点：</p>
+<ul>
+<li>所有新数据分别分发到批处理层和实时处理层</li>
+<li>批处理层有两个功能，管理主要数据（只能增加，不能更新）和为下一步计算批处理视图做预计算</li>
+<li>服务层计算出批处理视图中的数据做索引，以提供低延时，即席查询</li>
+<li>实时处理层仅处理实时数据，并为服务层提供查询服务</li>
+<li>任何查询可通过实时层和批处理层的查询结果合并得到</li>
+</ul>
+
+        <h4 id="解决时间窗口问题"   >
+          <a href="#解决时间窗口问题" class="heading-link"><i class="fas fa-link"></i></a>解决时间窗口问题</h4>
+      <p>Druid中，超过时间窗口的数据会被丢弃，为了解决这个问题，参考Lambda架构，实现方式如下：</p>
+<ol>
+<li>源数据都进入Kafka</li>
+<li>数据通过实时节点或索引服务进入Druid</li>
+<li>同时数据通过Flume备份到Hadoop</li>
+<li>定时或DQC发现数据丢失时，通过Druid Hadoop Index Job 重新摄入数据</li>
+</ol>
+
+        <h3 id="其他"   >
+          <a href="#其他" class="heading-link"><i class="fas fa-link"></i></a>其他</h3>
+      <p>Druid数据以时间分片，当短时间内涌入大量数据时会造成Segment文件过大，从而影响查询；Druid通过数据分片和复制使得数据分布到更多节点以提高效率</p>
+
+        <h4 id="数据分片"   >
+          <a href="#数据分片" class="heading-link"><i class="fas fa-link"></i></a>数据分片</h4>
+      <ul>
+<li><p>实时节点数据分片（可以通过tuningConfig中的shardSpec指定分片方式）</p>
+</li>
+<li><ul>
+<li>要求查询时所有分片必须存在</li>
+<li>要求指定分片总数</li>
+<li>添加新的实时节点时，不用更改原实时节点的配置</li>
+<li>查询时，即使分片缺失，所有分片都会被查询</li>
+<li>Linear分片：</li>
+<li>Numbered分片</li>
+</ul>
+</li>
+<li><p>DruidIndexJob分片（只能设置一种）</p>
+</li>
+<li><ul>
+<li>targetPartitionSize 通过设置分片大小计算分片个数</li>
+<li>numShards 直接设置分片个数</li>
+</ul>
+</li>
+<li><p>HadoopIndex Job 分片（通过partitionSpec设置）</p>
+</li>
+<li><ul>
+<li>哈希分片：基于维度值的哈希值分区（更快，分布更均匀）</li>
+<li>范围分区：基于纬度值的取值范围分区</li>
+</ul>
+</li>
+</ul>
+
+        <h4 id="数据复制"   >
+          <a href="#数据复制" class="heading-link"><i class="fas fa-link"></i></a>数据复制</h4>
+      <ul>
+<li>DeepStorage：系统一般自带副本能力，保证数据不丢失</li>
+<li>Druid内部数据复制：通过设置Segment副本来保证</li>
+</ul>
+
+        <h4 id="通过Tranquility操作索引服务"   >
+          <a href="#通过Tranquility操作索引服务" class="heading-link"><i class="fas fa-link"></i></a>通过Tranquility操作索引服务</h4>
+      <p>pass</p>
+
+        <h4 id="高基数维度优化"   >
+          <a href="#高基数维度优化" class="heading-link"><i class="fas fa-link"></i></a>高基数维度优化</h4>
+      <ul>
+<li><p>Cardinality aggregator（SQL中Count(distinct x)的默认方法）</p>
+</li>
+<li><ul>
+<li>基于HyperLoglog算法</li>
+<li>只在查询时优化，不减少存储容量</li>
+<li>效率比存储时预聚合的 HyperUnique aggregator低</li>
+</ul>
+</li>
+<li><p>HyperUnique aggregator</p>
+</li>
+<li><ul>
+<li>在摄取时进行预计算，效率更高</li>
+</ul>
+</li>
+</ul>
+
+        <h3 id="Kafka索引服务"   >
+          <a href="#Kafka索引服务" class="heading-link"><i class="fas fa-link"></i></a>Kafka索引服务</h3>
+      
+        <h4 id="设计背景"   >
+          <a href="#设计背景" class="heading-link"><i class="fas fa-link"></i></a>设计背景</h4>
+      <ul>
+<li>保证数据摄入的Exactly Once语义</li>
+<li>不受windowPeriod的约束，可以摄入任意时间戳的数据，而不仅仅是当前的数据</li>
+<li>操作易用性，自适应性强，可以根据Kafka分区增加或减少任务的数量</li>
+</ul>
+<p>windowPeriod的设定会导致超出时间窗口延迟的数据被丢弃，而过长的时间窗口会影响索引服务的任务完成退出和查询性能；影响数据不重复摄入的主要是Kafka的Offset管理。在最初的KafakDireChief采用高层的消费者，这会自动完成类似Broker的Leader选择，Offset维护，管理分区和消费者之间的均衡和重平衡等功能，同一个Group中的消息只会被一个消费者消费一次。</p>
+<ul>
+<li>同一个Group的消息只能被消费一次，导致很难实现多副本来保证高可用和查询一致性</li>
+<li>高等级消费者采用ZK存储Offset，导致内存增量持久化和Offset提交不在同一事物中。会存在持久化成功但是没提交的情况下节点失败会导致这条消息被重复消费。</li>
+</ul>
+
+        <h4 id="实现"   >
+          <a href="#实现" class="heading-link"><i class="fas fa-link"></i></a>实现</h4>
+      <p><strong>采用了Supervisor（监督者）的方式运行在Overlord上</strong></p>
+<ul>
+<li>KafkaSupervisor：负责索引任务创建和管理整个生命周期；监管索引任务状态来协调移交，管理失败，保障可扩展性等</li>
+<li>KafkaPartitions来记录Topic和分区-&gt;Offset的映射关系</li>
+<li>KafkaIndexTask从 KafkaIOConfig-&gt;startPartition的Offset开始读取，直到endPartition结束，发布移交Segment。执行过程中，startPartition-&gt;Offset不会改变，KafkaSupervisor通过修改endPartition来控制任务结束</li>
+<li>运行中的任务分读取和发布状态；任务会保持读取状态，直到达到taskDuartion后进入发布状态。接下来保持发布状态直到生成Segment并推送到DeepStorage，并且等待历史节点加载</li>
+<li>TaskGroup是KafkaSupervisor管理Kafka分区，Offset的数据结构</li>
+<li>Appenderator：索引数据，类似LSM-Tree的架构</li>
+<li>FiniteAppendderatorDriver驱动Appenderator完成有限流式数据的索引，在索引完成后执行移交操作</li>
+<li>SegmentAllocator 根据给定的时间戳，分配一个Segment</li>
+<li>检查任务是否达到任务的持续时间（taskDuration，默认一小时）。达到则发送信号提示停止读取数据，进入发布阶段</li>
+</ul>
+
+        <h5 id="终止taskGroup的流程"   >
+          <a href="#终止taskGroup的流程" class="heading-link"><i class="fas fa-link"></i></a>终止taskGroup的流程</h5>
+      <p>
+        <img   class="lazyload lazyload-gif"
+          src="/images/loading.svg" data-src="https://gitee.com/hoffeechen/image/raw/master/img/20200530211646.png"  alt="">
+      </p>
+
+        <h4 id="优势"   >
+          <a href="#优势" class="heading-link"><i class="fas fa-link"></i></a>优势</h4>
+      <ul>
+<li>去掉时间窗口，读取数据后根据时间戳使用SegmentAllocator分配到合适的Segment（缺点是这样会产生碎片化的Segment）</li>
+<li>Segment的发布和Offset的提交在同一事务中处理，都在发布截断完成，可以解决重复摄入的问题</li>
+</ul>
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="https://chenhefei.github.io">Paradiser</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="https://chenhefei.github.io/2020/05/30/Druid/Druid_real_time_big_data_analysis_principle/">https://chenhefei.github.io/2020/05/30/Druid/Druid_real_time_big_data_analysis_principle/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://chenhefei.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E6%A1%86%E6%9E%B6/">大数据框架</a></span><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://chenhefei.github.io/tags/Druid/">Druid</a></span></div><nav class="post-paginator paginator"><div class="paginator-next"><a class="paginator-next__link" href="/2020/05/30/westwind/20200530/"><span class="paginator-prev__text">明尼苏达的黑人兄弟们，静下心来，听我讲</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Druid的三个设计原则"><span class="toc-text">
+          Druid的三个设计原则</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#技术特点"><span class="toc-text">
+          技术特点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据格式"><span class="toc-text">
+          数据格式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#概览"><span class="toc-text">
+          概览</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#架构设计思想"><span class="toc-text">
+          架构设计思想</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#索引"><span class="toc-text">
+          索引</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Segment文件的制造和传播"><span class="toc-text">
+          Segment文件的制造和传播</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#高可用和可扩展性"><span class="toc-text">
+          高可用和可扩展性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#层的分组功能"><span class="toc-text">
+          层的分组功能</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#高可用和扩展"><span class="toc-text">
+          高可用和扩展</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#缓存"><span class="toc-text">
+          缓存</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#高可用"><span class="toc-text">
+          高可用</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#数据负载均衡"><span class="toc-text">
+          数据负载均衡</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#管理生命周期"><span class="toc-text">
+          管理生命周期</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#高可用性"><span class="toc-text">
+          高可用性</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#主从架构"><span class="toc-text">
+          主从架构</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#统治节点"><span class="toc-text">
+          统治节点</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#中间管理者-amp-苦工"><span class="toc-text">
+          中间管理者&amp;苦工</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#方式"><span class="toc-text">
+          方式</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#流式数据摄取"><span class="toc-text">
+          流式数据摄取</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Pull"><span class="toc-text">
+          Pull</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Push"><span class="toc-text">
+          Push</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#静态数据摄取"><span class="toc-text">
+          静态数据摄取</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#流式与批量数据摄取的结合"><span class="toc-text">
+          流式与批量数据摄取的结合</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Lambda架构"><span class="toc-text">
+          Lambda架构</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#解决时间窗口问题"><span class="toc-text">
+          解决时间窗口问题</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#其他"><span class="toc-text">
+          其他</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#数据分片"><span class="toc-text">
+          数据分片</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#数据复制"><span class="toc-text">
+          数据复制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#通过Tranquility操作索引服务"><span class="toc-text">
+          通过Tranquility操作索引服务</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#高基数维度优化"><span class="toc-text">
+          高基数维度优化</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Kafka索引服务"><span class="toc-text">
+          Kafka索引服务</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#设计背景"><span class="toc-text">
+          设计背景</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#实现"><span class="toc-text">
+          实现</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#终止taskGroup的流程"><span class="toc-text">
+          终止taskGroup的流程</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#优势"><span class="toc-text">
+          优势</span></a></li></ol></li></ol></section><!-- ov = overview--><section class="sidebar-ov hide"><div class="sidebar-ov-author"><div class="sidebar-ov-author__avatar"><img class="sidebar-ov-author__avatar_img" src="/images/icons/stun-logo.svg" alt="avatar"></div><p class="sidebar-ov-author__text">纸短情长</p></div><div class="sidebar-ov-social"><a class="sidebar-ov-social-item" href="https://github.com/chenhefei/" target="_blank" rel="noopener" data-popover="Github" data-popover-pos="up"><span class="sidebar-ov-social-item__icon"><i class="fab fa-github"></i></span></a></div><div class="sidebar-ov-state"><a class="sidebar-ov-state-item sidebar-ov-state-item--posts" href="/archives/"><div class="sidebar-ov-state-item__count">6</div><div class="sidebar-ov-state-item__name">归档</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--categories" href="/categories/"><div class="sidebar-ov-state-item__count">6</div><div class="sidebar-ov-state-item__name">分类</div></a><a class="sidebar-ov-state-item sidebar-ov-state-item--tags" href="/tags/"><div class="sidebar-ov-state-item__count">7</div><div class="sidebar-ov-state-item__name">标签</div></a></div><div class="sidebar-ov-cc"><a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" target="_blank" rel="noopener" data-popover="知识共享许可协议" data-popover-pos="up"><img src="/images/cc-by-nc-sa.svg"></a></div></section><div class="sidebar-reading"><div class="sidebar-reading-info"><span class="sidebar-reading-info__text">你已阅读了 </span><span class="sidebar-reading-info__num">0</span></div><div class="sidebar-reading-line"></div></div></aside></div><div class="clearfix"></div></div></main><footer class="footer" id="footer"><div class="footer-inner"><div><span>Copyright © 2020</span><span class="footer__icon"><i class="fas fa-heart"></i></span><span>Paradiser</span></div><div><span>由 <a href="http://hexo.io/" title="Hexo" target="_blank" rel="noopener">Hexo</a> 强力驱动</span><span> v4.2.1</span><span class="footer__devider">|</span><span>主题 - <a href="https://github.com/liuyib/hexo-theme-stun/" title="Stun" target="_blank" rel="noopener">Stun</a></span><span> v2.0.1</span></div></div></footer><div class="loading-bar" id="loading-bar"><div class="loading-bar__progress"></div></div><div class="back2top" id="back2top"><span class="back2top__icon"><i class="fas fa-rocket"></i></span></div></div><script src="https://cdn.jsdelivr.net/npm/jquery@v3.4.1/dist/jquery.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.min.js"></script><script src="https://cdn.jsdelivr.net/npm/velocity-animate@1.5.2/velocity.ui.min.js"></script><script src="https://cdn.jsdelivr.net/npm/lazyload@2.0.0-rc.2/lazyload.min.js"></script><script src="https://cdn.jsdelivr.net/npm/pjax@latest/pjax.min.js"></script><script>window.addEventListener('DOMContentLoaded', function () {
+  var pjax = new Pjax({"selectors":["head title","#main",".pjax-reload"],"history":true,"scrollTo":false,"scrollRestoration":false,"cacheBust":false,"debug":false,"currentUrlFullReload":false,"timeout":0});
+  // 加载进度条的计时器
+  var loadingTimer = null;
+
+  // 重置页面 Y 方向上的滚动偏移量
+  document.addEventListener('pjax:send', function () {
+    $('.header-nav-menu').removeClass('show');
+    if (CONFIG.pjax && CONFIG.pjax.avoidBanner) {
+      $('html').velocity('scroll', {
+        duration: 500,
+        offset: $('#header').height(),
+        easing: 'easeInOutCubic'
+      });
+    }
+
+    var loadingBarWidth = 20;
+    var MAX_LOADING_WIDTH = 95;
+
+    $('.loading-bar').addClass('loading');
+    $('.loading-bar__progress').css('width', loadingBarWidth + '%');
+    clearInterval(loadingTimer);
+    loadingTimer = setInterval(function () {
+      loadingBarWidth += 3;
+      if (loadingBarWidth > MAX_LOADING_WIDTH) {
+        loadingBarWidth = MAX_LOADING_WIDTH;
+      }
+      $('.loading-bar__progress').css('width', loadingBarWidth + '%');
+    }, 500);
+  }, false);
+
+  window.addEventListener('pjax:complete', function () {
+    clearInterval(loadingTimer);
+    $('.loading-bar__progress').css('width', '100%');
+    $('.loading-bar').removeClass('loading');
+    setTimeout(function () {
+      $('.loading-bar__progress').css('width', '0');
+    }, 400);
+    $('link[rel=prefetch], script[data-pjax-rm]').each(function () {
+      $(this).remove();
+    });
+    $('script[data-pjax], #pjax-reload script').each(function () {
+      $(this).parent().append($(this).remove());
+    });
+
+    if (Stun.utils.pjaxReloadBoot) {
+      Stun.utils.pjaxReloadBoot();
+    }
+    if (Stun.utils.pjaxReloadScroll) {
+      Stun.utils.pjaxReloadScroll();
+    }
+    if (Stun.utils.pjaxReloadSidebar) {
+      Stun.utils.pjaxReloadSidebar();
+    }
+    if (false) {
+      if (Stun.utils.pjaxReloadHeader) {
+        Stun.utils.pjaxReloadHeader();
+      }
+      if (Stun.utils.pjaxReloadScrollIcon) {
+        Stun.utils.pjaxReloadScrollIcon();
+      }
+      if (Stun.utils.pjaxReloadLocalSearch) {
+        Stun.utils.pjaxReloadLocalSearch();
+      }
+    }
+  }, false);
+}, false);</script><div id="pjax-reload"></div><script src="/js/utils.js?v=2.0.1"></script><script src="/js/stun-boot.js?v=2.0.1"></script><script src="/js/scroll.js?v=2.0.1"></script><script src="/js/header.js?v=2.0.1"></script><script src="/js/sidebar.js?v=2.0.1"></script></body></html>
