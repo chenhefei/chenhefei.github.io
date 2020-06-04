@@ -7,7 +7,7 @@
 <meta property="og:locale" content="zh_CN">
 <meta property="og:image" content="https://lormer.cn/sq2uE6cicHYyGduHdniaiczqQs6dj6WOdts4nzicrvFQLqCe9ET5ml3gWBMjP7s4kiaxq8AKjM5U5uwVHMNN5VmAFgg.jpg">
 <meta property="article:published_time" content="2020-06-04T05:11:15.000Z">
-<meta property="article:modified_time" content="2020-06-04T05:15:50.769Z">
+<meta property="article:modified_time" content="2020-06-04T05:38:02.537Z">
 <meta property="article:author" content="Paradiser">
 <meta property="article:tag" content="大数据框架">
 <meta property="article:tag" content="Spark">
@@ -40,12 +40,9 @@ window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 4.2.1"></he
           <a href="#Spark-Core源码精读-02-SparkContext组件初始化" class="heading-link"><i class="fas fa-link"></i></a>Spark Core源码精读_02 | SparkContext组件初始化</h2>
       <p><strong>目录</strong></p>
 <ul>
-<li><p>前言</p>
-</li>
-<li><p>SparkContext类的构造方法</p>
-</li>
-<li><p>SparkContext初始化的组件</p>
-</li>
+<li>前言</li>
+<li>SparkContext类的构造方法</li>
+<li>SparkContext初始化的组件</li>
 <li><ul>
 <li>SparkConf</li>
 <li>LiveListenerBus</li>
@@ -64,8 +61,7 @@ window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 4.2.1"></he
 <li>ContextCleaner</li>
 </ul>
 </li>
-<li><p>总结</p>
-</li>
+<li>总结</li>
 </ul>
 <hr>
 
@@ -218,7 +214,7 @@ window.CONFIG = CONFIG;</script><meta name="generator" content="Hexo 4.2.1"></he
           src="/images/loading.svg" data-src="https://lormer.cn/sq2uE6cicHYyGduHdniaiczqQs6dj6WOdts4nzicrvFQLqCe9ET5ml3gWBMjP7s4kiaxq8AKjM5U5uwVHMNN5VmAFgg.jpg"  alt="img">
       </p>
 <p>除了组件初始化之外，SparkContext内还有其他一部分有用的属性。并且在初始化的主流程做完之后，也有不少善后工作要做。下一篇文章就会分析它们。</p>
-</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="https://chenhefei.github.io">Paradiser</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="https://chenhefei.github.io/2020/06/04/Spark/SparkCore_src_02_SparkContext-Component-initialization/">https://chenhefei.github.io/2020/06/04/Spark/SparkCore_src_02_SparkContext-Component-initialization/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://chenhefei.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E6%A1%86%E6%9E%B6/">大数据框架</a></span><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://chenhefei.github.io/tags/Spark/">Spark</a></span></div><nav class="post-paginator paginator"><div class="paginator-prev"><a class="paginator-prev__link" href="/2020/06/04/Spark/SparkCore_src_03_SparkContext-Secondary-properties-and-post-initialization/"><span class="paginator-prev__icon"><i class="fas fa-angle-left"></i></span><span class="paginator-prev__text">Spark Core - 源码分析_03 - SparkContext辅助属性及后初始化</span></a></div><div class="paginator-next"><a class="paginator-next__link" href="/2020/06/04/Spark/SparkCore_src_01_SparkConf/"><span class="paginator-prev__text">Spark Core - 源码分析_01</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Spark-Core源码精读-02-SparkContext组件初始化"><span class="toc-text">
+</div><footer class="post-footer"><div class="post-ending ending"><div class="ending__text">------ 本文结束，感谢您的阅读 ------</div></div><div class="post-copyright copyright"><div class="copyright-author"><span class="copyright-author__name">本文作者: </span><span class="copyright-author__value"><a href="https://chenhefei.github.io">Paradiser</a></span></div><div class="copyright-link"><span class="copyright-link__name">本文链接: </span><span class="copyright-link__value"><a href="https://chenhefei.github.io/2020/06/04/Spark/SparkCore_src_02_SparkContext-Component-initialization/">https://chenhefei.github.io/2020/06/04/Spark/SparkCore_src_02_SparkContext-Component-initialization/</a></span></div><div class="copyright-notice"><span class="copyright-notice__name">版权声明: </span><span class="copyright-notice__value">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.en" rel="external nofollow" target="_blank">BY-NC-SA</a> 许可协议。转载请注明出处！</span></div></div><div class="post-tags"><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://chenhefei.github.io/tags/%E5%A4%A7%E6%95%B0%E6%8D%AE%E6%A1%86%E6%9E%B6/">大数据框架</a></span><span class="post-tags-item"><span class="post-tags-item__icon"><i class="fas fa-tag"></i></span><a class="post-tags-item__link" href="https://chenhefei.github.io/tags/Spark/">Spark</a></span></div><nav class="post-paginator paginator"><div class="paginator-prev"><a class="paginator-prev__link" href="/2020/06/04/Spark/SparkCore_src_03_SparkContext-Secondary-properties-and-post-initialization/"><span class="paginator-prev__icon"><i class="fas fa-angle-left"></i></span><span class="paginator-prev__text">Spark Core - 源码分析_03 - SparkContext辅助属性及后初始化</span></a></div><div class="paginator-next"><a class="paginator-next__link" href="/2020/06/04/Spark/SparkCore_src_01_SparkConf/"><span class="paginator-prev__text">Spark Core - 源码分析_01 - SparkConf</span><span class="paginator-next__icon"><i class="fas fa-angle-right"></i></span></a></div></nav></footer></div></div></div><div class="sidebar-wrap" id="sidebar-wrap"><aside class="sidebar" id="sidebar"><div class="sidebar-nav"><span class="sidebar-nav-toc current">文章目录</span><span class="sidebar-nav-ov">站点概览</span></div><section class="sidebar-toc"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Spark-Core源码精读-02-SparkContext组件初始化"><span class="toc-text">
           Spark Core源码精读_02 | SparkContext组件初始化</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#前言"><span class="toc-text">
           前言</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SparkContext类的构造方法"><span class="toc-text">
           SparkContext类的构造方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#SparkContext初始化的组件"><span class="toc-text">
